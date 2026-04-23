@@ -11,6 +11,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Simple request logger to help debugging on Render
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path} - Origin: ${req.headers.origin || '-'} - IP: ${req.ip}`);
+  if (req.body && Object.keys(req.body).length) console.log('  Body:', req.body);
+  next();
+});
+
 // ------------------ DB CONNECTION ------------------
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
@@ -53,6 +60,7 @@ const auth = (req, res, next) => {
 // REGISTER
 app.post("/api/register", async (req, res) => {
   try {
+    console.log('Register route hit');
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
@@ -77,6 +85,7 @@ app.post("/api/register", async (req, res) => {
 // LOGIN
 app.post("/api/login", async (req, res) => {
   try {
+    console.log('Login route hit');
     const { email, password } = req.body;
 
     if (!email || !password) return res.status(400).json("Email and password required");
