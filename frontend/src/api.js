@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const prod = "https://mse2-exam.onrender.com/api";
-const dev = "http://localhost:5000/api";
+const prod = "https://mse2-exam.onrender.com";
+const dev = "http://localhost:5000";
 const baseURL = window?.location?.hostname === "localhost" ? dev : prod;
 
 const API = axios.create({
