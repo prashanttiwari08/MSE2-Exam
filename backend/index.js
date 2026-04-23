@@ -50,32 +50,50 @@ const auth = (req, res, next) => {
 // ------------------ AUTH ROUTES ------------------
 
 // REGISTER
+// REGISTER
 app.post("/api/register", async (req, res) => {
-  const { name, email, password } = req.body;
+  try {
+    const { name, email, password } = req.body;
 
-  const existing = await User.findOne({ email });
-  if (existing) return res.status(400).json("Email already exists");
+    if (!name || !email || !password) {
+      return res.status(400).json("Name, email and password are required");
+    }
 
-  const hash = await bcrypt.hash(password, 10);
+    const existing = await User.findOne({ email });
+    if (existing) return res.status(400).json("Email already exists");
 
-  const user = await User.create({ name, email, password: hash });
+    const hash = await bcrypt.hash(password, 10);
 
-  res.json(user);
+    const user = await User.create({ name, email, password: hash });
+
+    res.json(user);
+  } catch (err) {
+    console.error('Register error:', err);
+    res.status(500).json(err.message || 'Server error');
+  }
 });
 
 // LOGIN
+// LOGIN
 app.post("/api/login", async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  const user = await User.findOne({ email });
-  if (!user) return res.status(400).json("Invalid Email");
+    if (!email || !password) return res.status(400).json("Email and password required");
 
-  const valid = await bcrypt.compare(password, user.password);
-  if (!valid) return res.status(400).json("Invalid Password");
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json("Invalid Email");
 
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) return res.status(400).json("Invalid Password");
 
-  res.json({ token });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+
+    res.json({ token });
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json(err.message || 'Server error');
+  }
 });
 
 // ------------------ GRIEVANCE ROUTES ------------------
