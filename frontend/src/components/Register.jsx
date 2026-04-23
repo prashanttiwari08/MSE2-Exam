@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import API from "../api";
 
 function Register() {
@@ -7,6 +8,7 @@ function Register() {
     email: "",
     password: ""
   });
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setData({ ...data, [e.target.name]: e.target.value });
@@ -16,9 +18,9 @@ function Register() {
     try {
       await API.post("/register", data);
       alert("Registered Successfully");
-      window.location = "/";
+      navigate("/");
     } catch (err) {
-      alert(err.response?.data);
+      alert(err.response?.data || err.message || "Registration failed");
     }
   };
 
